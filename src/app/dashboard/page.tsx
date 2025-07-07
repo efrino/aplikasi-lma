@@ -15,11 +15,16 @@ import {
 import { Card } from '@/components/ui/card'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
+interface Role {
+    id: string
+    name: string
+}
+
 export default function DashboardPage() {
     const { logout, chooseRole } = useAuth()
-    const [selectedRole, setSelectedRole] = useState<any | null>(null)
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null)
     const [menuTree, setMenuTree] = useState<MenuItem[]>([])
-    const [roles, setRoles] = useState<any[]>([])
+    const [roles, setRoles] = useState<Role[]>([])
     const [showRoleDialog, setShowRoleDialog] = useState(false)
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({})
 
@@ -61,8 +66,10 @@ export default function DashboardPage() {
 
         await chooseRole(roleId)
         const selected = roles.find((r) => r.id === roleId)
-        setSelectedRole(selected)
-        fetchMenus(roleId)
+        if (selected) {
+            setSelectedRole(selected)
+            fetchMenus(roleId)
+        }
         setShowRoleDialog(false)
     }
 
@@ -89,23 +96,38 @@ export default function DashboardPage() {
             {selectedRole ? (
                 <div className="space-y-4">
                     {menuTree.map((parent) => (
-                        <Card key={parent.id} className="p-4 bg-white border rounded shadow-sm">
+                        <Card
+                            key={parent.id}
+                            className="p-4 bg-white border rounded shadow-sm"
+                        >
                             <div
                                 className="flex justify-between items-center cursor-pointer"
                                 onClick={() => toggleOpen(parent.id)}
                             >
                                 <h3 className="font-semibold text-lg">{parent.name}</h3>
-                                {openMenus[parent.id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                                {openMenus[parent.id] ? (
+                                    <ChevronDown size={20} />
+                                ) : (
+                                    <ChevronRight size={20} />
+                                )}
                             </div>
-                            {openMenus[parent.id] && parent.children && parent.children.length > 0 && (
-                                <ul className="mt-2 space-y-1 pl-4 text-sm text-muted-foreground">
-                                    {parent.children.map((child) => (
-                                        <li key={child.id} className="hover:text-black cursor-pointer">
-                                            ▸ {child.name} <span className="ml-2 text-xs text-gray-400">{child.path}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+                            {openMenus[parent.id] &&
+                                parent.children &&
+                                parent.children.length > 0 && (
+                                    <ul className="mt-2 space-y-1 pl-4 text-sm text-muted-foreground">
+                                        {parent.children.map((child) => (
+                                            <li
+                                                key={child.id}
+                                                className="hover:text-black cursor-pointer"
+                                            >
+                                                ▸ {child.name}
+                                                <span className="ml-2 text-xs text-gray-400">
+                                                    {child.path}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                         </Card>
                     ))}
                 </div>
@@ -113,7 +135,8 @@ export default function DashboardPage() {
                 <Card className="p-6 text-center bg-blue-50 border-blue-200 border rounded-md shadow-sm">
                     <h2 className="text-xl font-semibold mb-2">Selamat Datang!</h2>
                     <p className="text-sm text-muted-foreground mb-4">
-                        Anda belum memilih peran aktif. Silakan pilih role untuk melanjutkan ke menu yang sesuai.
+                        Anda belum memilih peran aktif. Silakan pilih role untuk melanjutkan
+                        ke menu yang sesuai.
                     </p>
                     <Button onClick={() => setShowRoleDialog(true)}>Pilih Role</Button>
                 </Card>

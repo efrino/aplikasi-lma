@@ -1,19 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/features/auth/useAuth'
+import { Button } from '@/components/ui/button'
 import {
     Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
-    CardDescription,
-    CardContent,
-    CardFooter,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { useAuth } from '@/features/auth/useAuth'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
@@ -29,17 +29,13 @@ export default function LoginPage() {
         }
     }, [router])
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
             await login(username, password)
-            router.push('/dashboard') // ⬅️ langsung redirect ke dashboard
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Login gagal',
-                description: 'Periksa kembali username atau password Anda',
-            })
+            router.push('/dashboard')
+        } catch {
+            toast.error('Login gagal. Periksa kembali username atau password Anda.')
         }
     }
 
